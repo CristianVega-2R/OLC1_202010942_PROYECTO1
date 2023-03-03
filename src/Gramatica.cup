@@ -1,0 +1,152 @@
+import java_cup.runtime.Symbol;
+import java.util.LinkedList;
+
+parser code
+{:
+    private Symbol s;
+    
+    public void syntax_error(Symbol s){
+        this.s = s;
+    }
+
+    public Symbol getS(){
+        return this.s;
+}
+:};
+
+action code
+{:
+    public static LinkedList conjuntos = new LinkedList();
+    Conjunto conjunto = new Conjunto();
+    public static LinkedList raices = new LinkedList();
+    public static LinkedList tablas = new LinkedList();
+    public static LinkedList lexemas = new LinkedList();
+    Tabla tabla = new Tabla();
+    public int idArbol = 0;
+    public int idHoja = 1;
+:};
+
+terminal    ERROR, conj, abrirllaves, cerrarllaves, dospuntos, puntoycoma,
+            porcentaje, guion, menorque, mayorque, comillas, tilde,
+            coma, concatenacion, disyuncion, mas, asterisco, interrogacion;
+
+terminal String caracter, cadena, identificador;
+
+non terminal INICIO,REGLAS,LEXEMAS,CONJUNTO,LEXEMA,NOTACION,ER;
+
+non terminal Arbol EXP;
+
+precedence left concatenacion, disyuncion;
+precedence left mas, asterisco, interrogacion;
+
+start with INICIO;
+
+INICIO ::= abrirllaves REGLAS porcentaje porcentaje porcentaje porcentaje LEXEMAS cerrarllaves;
+
+REGLAS ::=  REGLAS CONJUNTO |
+            REGLAS ER |
+            CONJUNTO |
+            ER;
+
+LEXEMAS ::= LEXEMAS LEXEMA |
+            LEXEMA;
+
+CONJUNTO ::=    conj dospuntos identificador:nombre guion mayorque NOTACION puntoycoma {: conjunto.setNombre(nombre); conjuntos.add(conjunto); conjunto = new Conjunto();:};
+
+LEXEMA ::= identificador:nombre dospuntos cadena: cadena puntoycoma {: lexemas.add(new Lexema(nombre,cadena)); :};
+
+ER ::= identificador:nombre guion mayorque EXP:arbol puntoycoma {:
+        Arbol nodo1 = new Arbol("#", idArbol);
+        nodo1.setHoja(0);
+        tabla.setFila(0, "#");
+        idArbol++;
+        Arbol nodo2 = new Arbol(".", idArbol);
+        nodo2.ramaIzq = arbol;
+        nodo2.ramaDer = nodo1;
+        nodo2.setAnulabilidad();
+        nodo2.setPrimerosAnd();
+        nodo2.setUltimosAnd();
+        
+        tabla.setColumnas(arbol.getUltimos(),nodo1.getPrimeros());
+        Raiz raiz = new Raiz(nodo2,nombre);
+        tablas.add(tabla);
+        tabla = new Tabla();
+        raices.add(raiz);
+
+:};    
+
+NOTACION ::=    caracter:inicio tilde caracter:fin {:
+                conjunto.setRango(inicio, fin);
+ :}|
+                caracter:caracter coma NOTACION {:
+                conjunto.setCaracter(caracter);
+:}|
+                caracter:caracter {:
+                conjunto.setCaracter(caracter);
+:};
+
+EXP ::=  concatenacion EXP:izq EXP:der {: 
+        Arbol nodo = new Arbol(".", idArbol);
+        idArbol++;
+        nodo.ramaIzq = izq;
+        nodo.ramaDer = der;
+        nodo.setAnulabilidad();
+        nodo.setPrimerosAnd();
+        nodo.setUltimosAnd();
+        tabla.setColumnas(izq.getUltimos(),der.getPrimeros());
+        RESULT = nodo;
+ :} |
+        disyuncion EXP:izq EXP:der {:
+        Arbol nodo = new Arbol("|", idArbol);
+        idArbol++;
+        nodo.ramaIzq = der;
+        nodo.ramaDer = izq;
+        nodo.setAnulabilidad();
+        nodo.setPrimerosOr();
+        nodo.setUltimosOr();
+        RESULT = nodo;
+:} |
+        mas EXP:izq {:
+        Arbol nodo = new Arbol("+", idArbol);
+        idArbol++;
+        nodo.ramaIzq = izq;
+        nodo.setAnulabilidad();
+        nodo.setPrimerosUltimos();
+        tabla.setColumnas(izq.getUltimos(),izq.getPrimeros());
+        RESULT = nodo;
+:}|
+        asterisco EXP:izq {:
+        Arbol nodo = new Arbol("*", idArbol);
+        idArbol++;
+        nodo.ramaIzq = izq;
+        nodo.setAnulabilidad();
+        nodo.setPrimerosUltimos();
+        tabla.setColumnas(izq.getUltimos(),izq.getPrimeros());
+        RESULT = nodo;
+
+:}|
+        interrogacion EXP:izq {:
+        Arbol nodo = new Arbol("?", idArbol);
+        idArbol++;
+        nodo.ramaIzq = izq;
+        nodo.setAnulabilidad();
+        nodo.setPrimerosUltimos();;
+        RESULT = nodo;
+:}|
+        abrirllaves identificador:conjunto cerrarllaves {:
+        Arbol nodo = new Arbol(conjunto, idArbol);
+        nodo.setHoja(idHoja);
+        tabla.setFila(idHoja,conjunto);
+        idArbol++;
+        idHoja++;
+        RESULT = nodo;
+:}|
+        cadena:caracter {:
+        Arbol nodo = new Arbol(caracter, idArbol);
+        nodo.setHoja(idHoja);
+        tabla.setFila(idHoja,caracter);
+        idArbol++;
+        idHoja++;
+        RESULT = nodo;
+:};
+             
