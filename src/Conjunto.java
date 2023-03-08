@@ -26,9 +26,59 @@ public class Conjunto {
         int asciiInicio = (int) cInicio;
         int asciiFin = (int) cFin;
         
-        for(int i = asciiInicio; i <= asciiFin; i++){
-            lista.add((char) i);
+        char letras [] = {'a','b','c','d','e','f','g','h','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+        char numeros [] = {'0','1','2','3','4','5','6','7','8','9'};
+        
+        boolean soloSimbolosInicio = true;
+        boolean soloSimbolosFin = true;
+        boolean agregar = true;
+        
+        for(int i = 0; i < letras.length; i++){
+            if(letras[i]==cInicio){
+                soloSimbolosInicio = false;
+            }
+            if(letras[i]==cFin){
+                soloSimbolosFin = false;
+            }
         }
+        
+        if(soloSimbolosInicio == true || soloSimbolosFin == true){
+            soloSimbolosInicio = true;
+            soloSimbolosFin = true;
+            for(int i = 0; i < numeros.length; i++){
+                if(numeros[i]==cInicio){
+                    soloSimbolosInicio = false;
+                }
+                if(numeros[i]==cFin){
+                    soloSimbolosFin = false;
+                }
+            }
+        }
+        
+        for(int i = asciiInicio; i <= asciiFin; i++){
+            char caracter = (char) i;
+            agregar = true;
+            if(soloSimbolosInicio == true || soloSimbolosFin == true){
+                for(int j = 0; j < letras.length; j++){
+                    if(caracter == letras[j]){
+                        agregar = false;
+                    }
+                }
+
+                for(int j = 0; j < numeros.length; j++){
+                    if(caracter == numeros[j]){
+                        agregar = false;
+                    }
+                } 
+            }
+            
+            if(agregar == true){
+                lista.add(caracter);
+            }
+            
+        }
+        
+        
     }
     
     public LinkedList getLista(){

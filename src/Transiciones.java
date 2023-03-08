@@ -161,7 +161,7 @@ public class Transiciones {
         int estadoSiguiente = 0;
         String token = "";
         Fila transicion;
-        for(int i = 0; i < tablaTransiciones.getFilas(); i++){
+        for(int i = 0; i < tablaTransiciones.getFilas()-1; i++){
             filaActual = tablaTransiciones.getFila(i);
             estado = tablaTransiciones.getEncabezado(i);
             estadosSiguientes = filaActual.getColumna();
@@ -173,7 +173,12 @@ public class Transiciones {
                 if(token.charAt(0) == '"'){
                     token = token.substring(1, token.length()-1);
                 }
-                automata += "Nodo"+ String.valueOf(estado) + "->Nodo" + String.valueOf(estadoSiguiente) + "[label=\""+ token +"\"];\n";
+                if(String.valueOf(token).equals("#")){
+                    automata += "Nodo"+String.valueOf(estado)+"[style=\"rounded\", penwidth=2, peripheries=2];\n";
+                }else{
+                    automata += "Nodo"+ String.valueOf(estado) + "->Nodo" + String.valueOf(estadoSiguiente) + "[label=\""+ token +"\"];\n";
+                }
+                
                 
             }
         }

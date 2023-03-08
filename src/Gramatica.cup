@@ -149,4 +149,3 @@ EXP ::=  concatenacion EXP:izq EXP:der {:
         idHoja++;
         RESULT = nodo;
 :};
-             

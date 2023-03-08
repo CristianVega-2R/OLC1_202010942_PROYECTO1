@@ -9,6 +9,7 @@ import java_cup.runtime.Symbol;
 L=[a-zA-Z_]
 D=[0-9]
 espacio=[ \t\r\n]+
+
 %{
     private Symbol symbol(int type, Object value){
         return new Symbol(type, yyline, yycolumn, value);
@@ -21,9 +22,13 @@ espacio=[ \t\r\n]+
 
 {espacio} {/* Ignorar */}
 
+"//"(.)* {/* Ignorar */}
+
+"<!"(.|\t|\r|\n)*"!>" {/* Ignorar */}
+
 CONJ {return new Symbol(sym.conj, yychar, yyline, yytext());}
 
-\".*\" {return new Symbol(sym.cadena, yychar, yyline, yytext());}
+\"(\\\"|\\'|\\|.)*\" {return new Symbol(sym.cadena, yychar, yyline, yytext());}
 
 "{" {return new Symbol(sym.abrirllaves, yychar, yyline, yytext());}
 
@@ -57,7 +62,7 @@ CONJ {return new Symbol(sym.conj, yychar, yyline, yytext());}
 
 "?" {return new Symbol(sym.interrogacion, yychar, yyline, yytext());}
 
-{L} {return new Symbol(sym.caracter, yychar, yyline, yytext());}
+{L}|{D}|" "|"!"|"#"|"$"|"&"|"'"|"("|")"|"/"|"="|"`" {return new Symbol(sym.caracter, yychar, yyline, yytext());}
 
 {L}({L}|{D})* {return new Symbol(sym.identificador, yychar, yyline, yytext());}
 

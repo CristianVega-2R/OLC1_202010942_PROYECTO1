@@ -128,4 +128,35 @@ public class Arbol {
     public LinkedList getUltimos(){
         return ultimos;
     }
+    
+    public String getUltimosText(){
+        String ultimos = "";
+        for(int i = 0; i < this.ultimos.size(); i++){
+            ultimos += this.ultimos.get(i);
+            if(i+1 != this.ultimos.size()){
+                ultimos += ", ";
+            }
+        }
+        
+        return ultimos;
+    }
+    
+    public String getPrimerosText(){
+        String primeros = "";
+        for(int i = 0; i < this.primeros.size(); i++){
+            primeros += this.primeros.get(i);
+            if(i+1 != this.primeros.size()){
+                primeros += ", ";
+            }
+        }
+        
+        return primeros;
+    }
+    
+    public String getAnulabilidad(){
+        if(anulabilidad){
+            return "A";
+        }
+        return "N";
+    }
 }

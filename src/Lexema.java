@@ -6,6 +6,8 @@ public class Lexema {
         this.cadena = cadena;
     }
     
+
+    
     public String getNombre(){
         return nombre;
     }

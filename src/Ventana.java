@@ -281,6 +281,11 @@ public class Ventana extends javax.swing.JFrame {
         lexemas = CUP$Sintax$actions.lexemas;
         raices = CUP$Sintax$actions.raices;
         
+        for(int i = 0 ; i < conjuntos.size(); i++){
+            Conjunto conjunto = (Conjunto) conjuntos.get(i);
+            System.out.println(conjunto.getLista());
+        }
+        
         for(int i = 0; i < cantidadArbol; i++){
             // Creando arbol y tabla
             Raiz raiz = (Raiz) raices.get(i);
@@ -333,6 +338,7 @@ public class Ventana extends javax.swing.JFrame {
                 if(lex.getNombre().equals(raiz.getNombre())){
                     String lexArreglado = lex.getCadena().substring(1, lex.getCadena().length() - 1);
                     AnalizadorLexico analizar = new AnalizadorLexico(lexArreglado,automata.getTransiciones(),conjuntos, lex.getNombre());
+                    
                     try {
                         Resultado resultado = analizar.pasarCaracter();
                         resultadosCadenas.append("La cadena "+ resultado.getCadena() +" " + resultado.getAprobado() + " por el automata "+ resultado.getAutomata() +"\n");
@@ -428,10 +434,20 @@ public class Ventana extends javax.swing.JFrame {
     private void graphArbol(Arbol raiz){
         String id = String.valueOf(raiz.getId());
         String valor = raiz.getValor();
+        String anulabilidad = raiz.getAnulabilidad();
+        String primeros = raiz.getPrimerosText();
+        String ultimos = raiz.getUltimosText();
+        
         if(valor.charAt(0) == '"'){
             valor = valor.substring(1, valor.length()-1);
         }
-        graphviz += "Nodo"+ id +"[label=\"" + valor +"\"];\n";
+        
+        graphviz += "Nodo"+id+"[shape=none label=<<table border=\"0\" cellpadding=\"4\" cellspacing=\"0\">\n";
+        graphviz += "<tr>\n<td colspan=\"3\">"+anulabilidad+"</td>\n</tr>";
+        graphviz+= "<tr><td>"+primeros+"</td>";
+        graphviz += "<td bgcolor=\"#336699\">"+valor+"</td>";
+        graphviz += "<td>"+ultimos+"</td>\n</tr>\n</table>>];";
+       // graphviz += "Nodo"+ id +"[label=\"" + valor +"\"];\n";
             
         if(raiz.ramaIzq != null){
            String idIzq = String.valueOf(raiz.ramaIzq.getId());
@@ -442,6 +458,7 @@ public class Ventana extends javax.swing.JFrame {
             graphviz += "Nodo" + id + "->Nodo" + idDer + "\n";
         }
     }
+    
     
     private void analizarLexico(){
         String contenido = txt_entrada.getText();
