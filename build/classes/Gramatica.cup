@@ -27,10 +27,11 @@ action code
 :};
 
 terminal    ERROR, conj, abrirllaves, cerrarllaves, dospuntos, puntoycoma,
-            porcentaje, guion, menorque, mayorque, comillas, tilde,
+            porcentaje, menorque, mayorque, comillas, tilde,
             coma, concatenacion, disyuncion, mas, asterisco, interrogacion;
 
-terminal String caracter, cadena, identificador;
+terminal String caracter, cadena, identificador,tcomillasimple,tsaltodelinea,
+                guion;
 
 non terminal INICIO,REGLAS,LEXEMAS,CONJUNTO,LEXEMA,NOTACION,ER;
 
@@ -53,7 +54,7 @@ LEXEMAS ::= LEXEMAS LEXEMA |
 
 CONJUNTO ::=    conj dospuntos identificador:nombre guion mayorque NOTACION puntoycoma {: conjunto.setNombre(nombre); conjuntos.add(conjunto); conjunto = new Conjunto();:};
 
-LEXEMA ::= identificador:nombre dospuntos cadena: cadena puntoycoma {: lexemas.add(new Lexema(nombre,cadena)); :};
+LEXEMA ::= identificador:nombre dospuntos cadena: cadena puntoycoma {: System.out.println(cadena.replace("\\", "")); lexemas.add(new Lexema(nombre,cadena.replace("\\", ""))); :};
 
 ER ::= identificador:nombre guion mayorque EXP:arbol puntoycoma {:
         Arbol nodo1 = new Arbol("#", idArbol);
@@ -81,7 +82,13 @@ NOTACION ::=    caracter:inicio tilde caracter:fin {:
                 caracter:caracter coma NOTACION {:
                 conjunto.setCaracter(caracter);
 :}|
+                guion:caracter coma NOTACION {:
+                conjunto.setCaracter(caracter);
+:}|
                 caracter:caracter {:
+                conjunto.setCaracter(caracter);
+:}|
+                guion:caracter {:
                 conjunto.setCaracter(caracter);
 :};
 
@@ -107,12 +114,34 @@ EXP ::=  concatenacion EXP:izq EXP:der {:
         RESULT = nodo;
 :} |
         mas EXP:izq {:
-        Arbol nodo = new Arbol("+", idArbol);
+        Arbol nodo = new Arbol(".", idArbol);
         idArbol++;
+
+        Arbol asterisco = new Arbol("*", idArbol);
+        idArbol++;
+        
+        izq.idAux = idArbol;
+        izq.idHojas = idHoja;
+        izq.hojas = tabla;
+
+        Arbol aux = izq.recorrerStack(izq);
+
+        tabla = izq.hojas;
+        idArbol = izq.idAux;
+        idHoja = izq.idHojas;
+
+        asterisco.ramaIzq = aux;
+        asterisco.setAnulabilidad();
+        asterisco.setPrimerosUltimos();
+        tabla.setColumnas(asterisco.getUltimos(),asterisco.getPrimeros());
+        
         nodo.ramaIzq = izq;
+        nodo.ramaDer = asterisco;
         nodo.setAnulabilidad();
-        nodo.setPrimerosUltimos();
-        tabla.setColumnas(izq.getUltimos(),izq.getPrimeros());
+        nodo.setPrimerosAnd();
+        nodo.setUltimosAnd();
+        tabla.setColumnas(izq.getUltimos(),asterisco.getPrimeros());
+
         RESULT = nodo;
 :}|
         asterisco EXP:izq {:
@@ -126,11 +155,19 @@ EXP ::=  concatenacion EXP:izq EXP:der {:
 
 :}|
         interrogacion EXP:izq {:
-        Arbol nodo = new Arbol("?", idArbol);
+        Arbol nodo = new Arbol("|", idArbol);
         idArbol++;
+
         nodo.ramaIzq = izq;
+        Arbol epsilon = new Arbol("epsilon", idArbol);
+        epsilon.setHoja(idHoja);
+        tabla.setFila(idHoja,"epsilon");
+        idHoja++;
+        idArbol++;
+        nodo.ramaDer = epsilon;
         nodo.setAnulabilidad();
-        nodo.setPrimerosUltimos();;
+        nodo.setPrimerosOr();
+        nodo.setUltimosOr();
         RESULT = nodo;
 :}|
         abrirllaves identificador:conjunto cerrarllaves {:
@@ -145,6 +182,22 @@ EXP ::=  concatenacion EXP:izq EXP:der {:
         Arbol nodo = new Arbol(caracter, idArbol);
         nodo.setHoja(idHoja);
         tabla.setFila(idHoja,caracter);
+        idArbol++;
+        idHoja++;
+        RESULT = nodo;
+:}|     
+        tcomillasimple:caracter {:
+        Arbol nodo = new Arbol("\"'\"", idArbol);
+        nodo.setHoja(idHoja);
+        tabla.setFila(idHoja,"\"'\"");
+        idArbol++;
+        idHoja++;
+        RESULT = nodo;
+:}|     
+        tsaltodelinea:caracter {:
+        Arbol nodo = new Arbol("\"\n\"", idArbol);
+        nodo.setHoja(idHoja);
+        tabla.setFila(idHoja,"\"\n\"");
         idArbol++;
         idHoja++;
         RESULT = nodo;

@@ -24,11 +24,16 @@ espacio=[ \t\r\n]+
 
 "//"(.)* {/* Ignorar */}
 
-"<!"(.|\t|\r|\n)*"!>" {/* Ignorar */}
+"\\'" {System.out.println("comillas"); return new Symbol(sym.tcomillasimple, yychar, yyline, yytext());}
+
+"\\n" {System.out.println("salto de linea"); return new Symbol(sym.tsaltodelinea, yychar, yyline, yytext());}
+
+
+"<!"[^>]*"!>" {/* Ignorar */}
 
 CONJ {return new Symbol(sym.conj, yychar, yyline, yytext());}
 
-\"(\\\"|\\'|\\|.)*\" {return new Symbol(sym.cadena, yychar, yyline, yytext());}
+\"(\\.|[^\"])*\" {return new Symbol(sym.cadena, yychar, yyline, yytext());}
 
 "{" {return new Symbol(sym.abrirllaves, yychar, yyline, yytext());}
 
@@ -62,7 +67,9 @@ CONJ {return new Symbol(sym.conj, yychar, yyline, yytext());}
 
 "?" {return new Symbol(sym.interrogacion, yychar, yyline, yytext());}
 
-{L}|{D}|" "|"!"|"#"|"$"|"&"|"'"|"("|")"|"/"|"="|"`" {return new Symbol(sym.caracter, yychar, yyline, yytext());}
+
+
+{L}|{D}|" "|"!"|"#"|"$"|"&"|"'"|"("|")"|"/"|"="|"`"|"_" {System.out.println("Se reconocio: " + yytext()); return new Symbol(sym.caracter, yychar, yyline, yytext());}
 
 {L}({L}|{D})* {return new Symbol(sym.identificador, yychar, yyline, yytext());}
 
