@@ -67,9 +67,7 @@ CONJ {return new Symbol(sym.conj, yychar, yyline, yytext());}
 
 "?" {return new Symbol(sym.interrogacion, yychar, yyline, yytext());}
 
-
-
-{L}|{D}|" "|"!"|"#"|"$"|"&"|"'"|"("|")"|"/"|"="|"`"|"_" {System.out.println("Se reconocio: " + yytext()); return new Symbol(sym.caracter, yychar, yyline, yytext());}
+{L}|{D}|" "|"!"|"#"|"$"|"&"|"'"|"("|")"|"/"|"="|"`"|"_" { return new Symbol(sym.caracter, yychar, yyline, yytext());}
 
 {L}({L}|{D})* {return new Symbol(sym.identificador, yychar, yyline, yytext());}
 

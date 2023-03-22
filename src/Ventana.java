@@ -1,8 +1,10 @@
 import com.google.gson.Gson;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
@@ -13,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 
 public class Ventana extends javax.swing.JFrame {
@@ -76,6 +79,11 @@ public class Ventana extends javax.swing.JFrame {
         jButton2.setText("Guardar");
 
         jButton3.setText("Guardar como");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -249,7 +257,22 @@ public class Ventana extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(selectedFile));
+                String line = "";
+                String content = "";
+                while ((line = reader.readLine()) != null) {
+                    content += line + "\n";
+                }
+                txt_entrada.setText(content);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }   
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void btn_automataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_automataActionPerformed
@@ -266,9 +289,16 @@ public class Ventana extends javax.swing.JFrame {
         lexemas = CUP$Sintax$actions.lexemas;
         raices = CUP$Sintax$actions.raices;
         
+        Raiz raizGeneral = (Raiz) raices.get(0);
+        String nombreGeneral = raizGeneral.getNombre();
+        
+        crearDot(nombreGeneral+"Errores", generarErrores(errores));
+        crearImagen(nombreGeneral+"Errores");
+        imagenes.addItem(nombreGeneral+"Errores"); 
+        
+        
         for(int i = 0 ; i < conjuntos.size(); i++){
             Conjunto conjunto = (Conjunto) conjuntos.get(i);
-            System.out.println(conjunto.getLista());
         }
         
         for(int i = 0; i < cantidadArbol; i++){
@@ -344,8 +374,6 @@ public class Ventana extends javax.swing.JFrame {
         }catch(Exception e){
             
         }
-        
-        
     }//GEN-LAST:event_btn_analizarActionPerformed
 
     private void imagenesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imagenesActionPerformed
@@ -357,6 +385,21 @@ public class Ventana extends javax.swing.JFrame {
         imagenActualLabel.setIcon(imagenFinal);
     }//GEN-LAST:event_imagenesActionPerformed
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showSaveDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try {
+                FileWriter writer = new FileWriter(selectedFile);
+                writer.write(txt_entrada.getText());
+                writer.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
     public String graphviz = "";
     public String graphvizTabla = "";
     public String graphvizDiagrama = "";    
@@ -365,6 +408,7 @@ public class Ventana extends javax.swing.JFrame {
     public LinkedList conjuntos = new LinkedList();
     public LinkedList lexemas = new LinkedList();
     public LinkedList raices = new LinkedList();
+    public LinkedList errores = new LinkedList();
     
     private void crearImagen(String nombre){
         String dotFilePath = "C:/Users/Cristian/Documents/NetBeansProjects/Proyecto1/"+nombre+".dot";
@@ -415,6 +459,25 @@ public class Ventana extends javax.swing.JFrame {
             recorrerArbol(raiz.ramaDer);  
         }
     }
+    
+    private String generarErrores(LinkedList errores) {
+        String graphviz = "node[shape=none];\ntable[label=<<table border=\"1\" cellborder=\"1\" cellspacing=\"0\">\n";
+        for(int i = 0; i < Sintax.errores.size(); i++){
+            Errores error = (Errores) Sintax.errores.get(i);
+            graphviz+="<tr>\n<td>Sintactico</td>\n";
+            graphviz += "<td>"+error.token+"</td>\n";
+            graphviz+="<td>\n";
+            graphviz+=String.valueOf(error.col);
+            graphviz+="</td>\n";
+            graphviz+="<td>\n";
+            graphviz+=String.valueOf(error.fil + 1);
+            graphviz+="</td>\n";
+            graphviz+="</tr>\n";
+        }
+        graphviz += "</table>>];\n";
+        return graphviz;
+    }
+    
     
     private void graphArbol(Arbol raiz){
         String id = String.valueOf(raiz.getId());
@@ -526,4 +589,6 @@ public class Ventana extends javax.swing.JFrame {
     private javax.swing.JTextArea resultadosCadenas;
     private javax.swing.JTextArea txt_entrada;
     // End of variables declaration//GEN-END:variables
+
+    
 }

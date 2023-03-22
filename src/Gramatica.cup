@@ -1,12 +1,13 @@
 import java_cup.runtime.Symbol;
 import java.util.LinkedList;
+import java_cup.runtime.Scanner;
 
 parser code
 {:
     private Symbol s;
-    
+    public static LinkedList errores = new LinkedList();
     public void syntax_error(Symbol s){
-        this.s = s;
+        errores.add(new Errores(s.left, s.right, (String) s.value));
     }
 
     public Symbol getS(){
@@ -21,6 +22,7 @@ action code
     public static LinkedList raices = new LinkedList();
     public static LinkedList tablas = new LinkedList();
     public static LinkedList lexemas = new LinkedList();
+    
     Tabla tabla = new Tabla();
     public int idArbol = 0;
     public int idHoja = 1;
@@ -42,7 +44,8 @@ precedence left mas, asterisco, interrogacion;
 
 start with INICIO;
 
-INICIO ::= abrirllaves REGLAS porcentaje porcentaje porcentaje porcentaje LEXEMAS cerrarllaves;
+INICIO ::= abrirllaves REGLAS porcentaje porcentaje porcentaje porcentaje LEXEMAS cerrarllaves
+            | error;
 
 REGLAS ::=  REGLAS CONJUNTO |
             REGLAS ER |
