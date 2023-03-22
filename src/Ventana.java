@@ -292,9 +292,14 @@ public class Ventana extends javax.swing.JFrame {
         Raiz raizGeneral = (Raiz) raices.get(0);
         String nombreGeneral = raizGeneral.getNombre();
         
-        crearDot(nombreGeneral+"Errores", generarErrores(errores));
-        crearImagen(nombreGeneral+"Errores");
-        imagenes.addItem(nombreGeneral+"Errores"); 
+        File carpeta = new File("ERRORES_202010942");
+            if (!carpeta.exists()) {
+                carpeta.mkdir();
+            }
+        
+        crearDot("ERRORES_202010942/"+nombreGeneral+"Errores", generarErrores(errores));
+        crearImagen("ERRORES_202010942/"+nombreGeneral+"Errores");
+        imagenes.addItem("ERRORES_202010942/"+nombreGeneral+"Errores"); 
         
         
         for(int i = 0 ; i < conjuntos.size(); i++){
@@ -308,9 +313,15 @@ public class Ventana extends javax.swing.JFrame {
             String nombre = raiz.getNombre();
             recorrerArbol(arbol);
             
-            crearDot(nombre+"Arbol", graphviz);
-            crearImagen(nombre+"Arbol");
-            imagenes.addItem(nombre + "Arbol"); 
+            
+            carpeta = new File("ARBOLES_202010942");
+            if (!carpeta.exists()) {
+                carpeta.mkdir();
+            }
+            
+            crearDot("ARBOLES_202010942/"+nombre+"Arbol", graphviz);
+            crearImagen("ARBOLES_202010942/"+nombre+"Arbol");
+            imagenes.addItem("ARBOLES_202010942/"+nombre + "Arbol"); 
             
             Tabla tabla = (Tabla) CUP$Sintax$actions.tablas.get(i);
             Transiciones tablaTransicion = new Transiciones(tabla, arbol.getPrimeros());
@@ -318,21 +329,35 @@ public class Ventana extends javax.swing.JFrame {
             tablaTransicion.crearTransiciones();
             tablaTransicion.crearTablaTransicionesGrafica();
             
+            carpeta = new File("SIGUIENTES_202010942");
+            if (!carpeta.exists()) {
+                carpeta.mkdir();
+            }
+            
             graphvizTabla = tablaTransicion.construirTablaSiguientes();
-            crearDot(nombre+"Siguientes", graphvizTabla);
-            crearImagen(nombre+"Siguientes");
-            imagenes.addItem(nombre + "Siguientes"); 
+            crearDot("SIGUIENTES_202010942/"+nombre+"Siguientes", graphvizTabla);
+            crearImagen("SIGUIENTES_202010942/"+nombre+"Siguientes");
+            imagenes.addItem("SIGUIENTES_202010942/"+nombre + "Siguientes"); 
+            
+            carpeta = new File("TRANSICIONES_202010942");
+            if (!carpeta.exists()) {
+                carpeta.mkdir();
+            }
             
             graphvizTablaTransicion = tablaTransicion.construirTablaTransiciones();
-            crearDot(nombre+"Transiciones", graphvizTablaTransicion);
-            crearImagen(nombre+"Transiciones");
-            imagenes.addItem(nombre + "Transiciones");
+            crearDot("TRANSICIONES_202010942/"+nombre+"Transiciones", graphvizTablaTransicion);
+            crearImagen("TRANSICIONES_202010942/"+nombre+"Transiciones");
+            imagenes.addItem("TRANSICIONES_202010942/"+nombre + "Transiciones");
             
+            carpeta = new File("AFD_202010942");
+            if (!carpeta.exists()) {
+                carpeta.mkdir();
+            }
             
             graphvizDiagrama = tablaTransicion.construirAutomata();
-            crearDot(nombre+"Automata",graphvizDiagrama);
-            crearImagen(nombre+"Automata");
-            imagenes.addItem(nombre + "Automata");
+            crearDot("AFD_202010942/"+nombre+"Automata",graphvizDiagrama);
+            crearImagen("AFD_202010942/"+nombre+"Automata");
+            imagenes.addItem("AFD_202010942/"+nombre + "Automata");
             
             graphviz = "";
             graphvizTabla = "";
@@ -365,7 +390,13 @@ public class Ventana extends javax.swing.JFrame {
         Gson gson = new Gson();
         String json = gson.toJson(list);
         try{
-            File file = new File("resultados.json");
+            carpeta = new File("SALIDAS_202010942");
+            if (!carpeta.exists()) {
+                carpeta.mkdir();
+            }
+            
+            
+            File file = new File("SALIDAS_202010942/"+nombreGeneral +"resultados.json");
             FileWriter fileWriter = new FileWriter(file);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(json);

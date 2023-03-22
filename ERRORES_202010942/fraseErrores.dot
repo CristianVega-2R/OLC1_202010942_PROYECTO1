@@ -1,0 +1,14 @@
+digraph G{
+node[shape=none];
+table[label=<<table border="1" cellborder="1" cellspacing="0">
+<tr>
+<td>Sintactico</td>
+<td>cadena</td>
+<td>
+474</td>
+<td>
+19</td>
+</tr>
+</table>>];
+
+}
